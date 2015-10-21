@@ -1,0 +1,47 @@
+{
+  "name": "live-prompt",
+  "version": "1.0.0",
+  "description": "Simple console with history and autocomplete.",
+  "main": "build/index.js",
+  "scripts": {
+    "init": "rimraf .validate.json && rimraf .jshintrc",
+    "clean": "rimraf build",
+    "lint": "eslint source test",
+    "prebuild": "npm run clean",
+    "build": "babel source/ -x \".es6\" --out-dir build/",
+    "build:doc": "doctoc --github --title \"## Contents\" ./",
+    "validate": "npm ls",
+    "test": "babel-node test/index.es6 | faucet"
+  },
+  "devDependencies": {
+    "babel": "^5.8.21",
+    "babel-eslint": "^4.0.5",
+    "babel-loader": "^5.3.2",
+    "babel-plugin-object-assign": "^1.2.1",
+    "doctoc": "^0.14.2",
+    "eslint": "^1.1.0",
+    "eslint-loader": "^1.0.0",
+    "faucet": "0.0.1",
+    "precommit-hook": "^3.0.0",
+    "rimraf": "^2.4.2",
+    "tape": "^4.2.1"
+  },
+  "author": "Gonzalo Acosta <gacosta.r89@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/gacosta89/live-prompt/issues"
+  },
+  "homepage": "https://github.com/gacosta89/live-prompt",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gacosta89/live-prompt.git"
+  },
+  "pre-commit": [
+    "lint",
+    "validate",
+    "test"
+  ],
+  "dependencies": {
+    "immutable": "^3.7.5"
+  }
+}
