@@ -11,7 +11,9 @@
     "build": "babel source/ -x \".es6\" --out-dir build/",
     "build:doc": "doctoc --github --title \"## Contents\" ./",
     "validate": "npm ls",
-    "test": "babel-node test/index.es6 | faucet"
+    "test": "npm run test:unit && npm run test:integration",
+    "test:unit": "babel-node test/unit/index | faucet",
+    "test:integration": "babel-node test/integration/index | faucet"
   },
   "devDependencies": {
     "babel": "^5.8.21",

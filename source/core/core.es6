@@ -1,9 +1,9 @@
 /**
  * Created by gonzalo on 20/10/15.
  */
-import {Map} from 'immutable';
+import {fromJS} from 'immutable';
 
-export const INITIAL_STATE = Map({
+export const INITIAL_STATE = fromJS({
     history: [],
     count: 0,
     current: 0
