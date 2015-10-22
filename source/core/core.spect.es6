@@ -3,46 +3,64 @@
  */
 import test from 'tape';
 import {fromJS} from 'immutable';
-import {newState, undo, redo, cancel} from './core';
+import {commit, prev, next, cancel, backspace, chunk} from './core';
 
-test('set command', nest => {
-  nest.test('...with future', assert => {
-    const msg = 'should set the current command.',
-      state = fromJS({
-        history: ['base base.json', 'set broker.id=225', ''],
-        count: 3,
-        current: 0
-      }),
-      action = {
-        type: 'COMMAND',
-        data: 'set broker.name=gonzalo'
+test('commit', assert => {
+  const msg = 'should commit the current buffer.',
+    state = fromJS({
+      history: {
+        commands: ['base base.json', 'set broker.id=225'],
+        index: 0
       },
-      expected = {
-        history: ['base base.json', 'set broker.id=225', 'set broker.name=gonzalo', ''],
-        count: 4,
-        current: 3
+      present: {
+        buffer: 'set broker.name=gonzalo',
+        command: 'sth'
+      }
+    }),
+    action = {
+      type: 'COMMAND',
+      data: 'set broker.name=gonzalo'
+    },
+    expected = {
+      history: {
+        commands: ['base base.json', 'set broker.id=225', 'set broker.name=gonzalo'],
+        index: 4
       },
-      actual = newState(state, action).toJS();
+      present: {
+        buffer: '',
+        command: ''
+      }
+    },
+    actual = commit(state, action).toJS();
 
-    assert.deepEqual(actual, expected, msg);
-    assert.end();
-  });
+  assert.deepEqual(actual, expected, msg);
+  assert.end();
 });
 
-test('undo', nest => {
+test('prev', nest => {
   nest.test('... with past', assert => {
     const msg = 'should show the prev command.',
       state = fromJS({
-        history: ['base base.json', 'set broker.name', ''],
-        count: 3,
-        current: 1
+        history: {
+        commands: ['base base.json', 'set broker.id=225'],
+        index: 2
+      },
+        present: {
+          buffer: 'set broker.name=gonzalo',
+          command: ''
+        }
       }),
       expected = {
-        history: ['base base.json', 'set broker.name', ''],
-        count: 3,
-        current: 0
+        history: {
+          commands: ['base base.json', 'set broker.id=225'],
+          index: 1
+        },
+        present: {
+          buffer: 'set broker.id=225',
+          command: 'set broker.name=gonzalo'
+        }
       },
-      actual = undo(state).toJS();
+      actual = prev(state).toJS();
 
     assert.deepEqual(actual, expected, msg);
     assert.end();
@@ -51,16 +69,26 @@ test('undo', nest => {
   nest.test('... without past.', assert => {
     const msg = 'should show the last command.',
       state = fromJS({
-        history: ['base base.json', 'set broker.name', ''],
-        count: 3,
-        current: 0
+        history: {
+          commands: ['base base.json', 'set broker.id=225'],
+          index: 0
+        },
+        present: {
+          buffer: 'base base.js and something else',
+          command: 'set broker.name=gonzalo'
+        }
       }),
       expected = {
-        history: ['base base.json', 'set broker.name', ''],
-        count: 3,
-        current: 0
+        history: {
+          commands: ['base base.json', 'set broker.id=225'],
+          index: 0
+        },
+        present: {
+          buffer: 'base base.js and something else',
+          command: 'set broker.name=gonzalo'
+        }
       },
-      actual = undo(state).toJS();
+      actual = prev(state).toJS();
 
     assert.deepEqual(actual, expected, msg);
     assert.end();
@@ -68,20 +96,30 @@ test('undo', nest => {
 
 });
 
-test('redo', nest => {
+test('next', nest => {
   nest.test('... with future', assert => {
     const msg = 'should show the next command.',
       state = fromJS({
-        history: ['base base.json', 'set broker.name', ''],
-        count: 3,
-        current: 0
+        history: {
+          commands: ['base base.json', 'set broker.id=225'],
+          index: 1
+        },
+        present: {
+          buffer: 'set broker.id a little bit edited',
+          command: 'set broker.name=gonzalo'
+        }
       }),
       expected = {
-        history: ['base base.json', 'set broker.name', ''],
-        count: 3,
-        current: 1
+        history: {
+          commands: ['base base.json', 'set broker.id=225'],
+          index: 2
+        },
+        present: {
+          buffer: 'set broker.name=gonzalo',
+          command: ''
+        }
       },
-      actual = redo(state).toJS();
+      actual = next(state).toJS();
 
     assert.deepEqual(actual, expected, msg);
     assert.end();
@@ -90,35 +128,144 @@ test('redo', nest => {
   nest.test('... without future.', assert => {
     const msg = 'should show the last command.',
       state = fromJS({
-        history: ['base base.json', 'set broker.name', ''],
-        count: 3,
-        current: 2
+        history: {
+          commands: ['base base.json', 'set broker.id=225'],
+          index: 2
+        },
+        present: {
+          buffer: 'set broker.name=gonzalo',
+          command: ''
+        }
       }),
       expected = {
-        history: ['base base.json', 'set broker.name', ''],
-        count: 3,
-        current: 2
+        history: {
+          commands: ['base base.json', 'set broker.id=225'],
+          index: 2
+        },
+        present: {
+          buffer: 'set broker.name=gonzalo',
+          command: ''
+        }
       },
-      actual = redo(state).toJS();
+      actual = next(state).toJS();
 
     assert.deepEqual(actual, expected, msg);
     assert.end();
   });
 });
 
-test('cancel', assert => {
-  const msg = 'should cancel history search.',
+test('cancel', nest => {
+  nest.test('...first time', assert => {
+    const msg = 'should cancel edit mode.',
+      state = fromJS({
+        history: {
+          commands: ['base base.json', 'set broker.id=225'],
+          index: 0
+        },
+        present: {
+          buffer: 'base base.json a little bit edited',
+          command: 'set broker.name=gonzalo'
+        }
+      }),
+      expected = {
+        history: {
+          commands: ['base base.json', 'set broker.id=225'],
+          index: 0
+        },
+        present: {
+          buffer: 'base base.json',
+          command: 'set broker.name=gonzalo'
+        }
+      },
+      actual = cancel(state).toJS();
+
+    assert.deepEqual(actual, expected, msg);
+    assert.end();
+  });
+  nest.test('...second time', assert => {
+    const msg = 'should cancel history search.',
+      state = fromJS({
+        history: {
+          commands: ['base base.json', 'set broker.id=225'],
+          index: 0
+        },
+        present: {
+          buffer: 'base base.json',
+          command: 'set broker.name=gonzalo'
+        }
+      }),
+      expected = {
+        history: {
+          commands: ['base base.json', 'set broker.id=225'],
+          index: 2
+        },
+        present: {
+          buffer: 'set broker.name=gonzalo',
+          command: ''
+        }
+      },
+      actual = cancel(state).toJS();
+
+    assert.deepEqual(actual, expected, msg);
+    assert.end();
+  });
+});
+
+test('backspace', assert => {
+  const msg = 'should erase last character.',
     state = fromJS({
-      history: ['base base.json', 'set broker.name', ''],
-      count: 3,
-      current: 0
+      history: {
+        commands: ['base base.json', 'set broker.id=225'],
+        index: 1
+      },
+      present: {
+        buffer: 'set broker.id=225',
+        command: 'set broker.name=gonzalo'
+      }
     }),
     expected = {
-      history: ['base base.json', 'set broker.name', ''],
-      count: 3,
-      current: 2
+      history: {
+        commands: ['base base.json', 'set broker.id=225'],
+        index: 1
+      },
+      present: {
+        buffer: 'set broker.id=22',
+        command: 'set broker.name=gonzalo'
+      }
     },
-    actual = cancel(state).toJS();
+    actual = backspace(state).toJS();
+
+  assert.deepEqual(actual, expected, msg);
+  assert.end();
+});
+
+test('chunk', assert => {
+  const msg = 'should concat the chunk to the buffer.',
+    state = fromJS({
+      history: {
+        commands: ['base base.json', 'set broker.id=225'],
+        index: 1
+      },
+      present: {
+        buffer: 'set broker.id=22',
+        command: 'set broker.name=gonzalo'
+      }
+    }),
+    action = {
+      type: 'chunk',
+      data: '5'
+    },
+    expected = {
+      history: {
+        commands: ['base base.json', 'set broker.id=225'],
+        index: 1
+      },
+      present: {
+        buffer: 'set broker.id=225',
+        command: 'set broker.name=gonzalo'
+      }
+    },
+    actual = chunk(state, action).toJS();
 
   assert.deepEqual(actual, expected, msg);
   assert.end();
