@@ -1,13 +1,14 @@
 /**
  * Created by gonzalo on 20/10/15.
  */
-import {newState, undo, redo, INITIAL_STATE} from '../core/core';
+import {newState, undo, redo, cancel, INITIAL_STATE} from '../core/core';
 
-export const reducer = (state = INITIAL_STATE, action = {}) => {
+export default function reducer (state = INITIAL_STATE, action = {}) {
   const actionHandlers = {
     command: newState,
     undo,
-    redo
+    redo,
+    cancel
   };
 
   if (!actionHandlers.hasOwnProperty(action.type)) {
@@ -15,4 +16,4 @@ export const reducer = (state = INITIAL_STATE, action = {}) => {
   }
 
   return actionHandlers[action.type](state, action);
-};
+}

@@ -6,7 +6,7 @@
   "scripts": {
     "init": "rimraf .validate.json && rimraf .jshintrc",
     "clean": "rimraf build",
-    "lint": "eslint source test",
+    "lint": "eslint --ext .es6 source test",
     "prebuild": "npm run clean",
     "build": "babel source/ -x \".es6\" --out-dir build/",
     "build:doc": "doctoc --github --title \"## Contents\" ./",
@@ -15,6 +15,11 @@
     "test:unit": "babel-node test/unit/index | faucet",
     "test:integration": "babel-node test/integration/index | faucet"
   },
+  "dependencies": {
+    "immutable": "^3.7.5",
+    "keypress": "^0.2.1",
+    "redux": "^3.0.3"
+  },
   "devDependencies": {
     "babel": "^5.8.21",
     "babel-eslint": "^4.0.5",
@@ -22,7 +27,6 @@
     "babel-plugin-object-assign": "^1.2.1",
     "doctoc": "^0.14.2",
     "eslint": "^1.1.0",
-    "eslint-loader": "^1.0.0",
     "faucet": "0.0.1",
     "precommit-hook": "^3.0.0",
     "rimraf": "^2.4.2",
@@ -42,8 +46,5 @@
     "lint",
     "validate",
     "test"
-  ],
-  "dependencies": {
-    "immutable": "^3.7.5"
-  }
+  ]
 }
