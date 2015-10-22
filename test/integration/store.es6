@@ -8,15 +8,21 @@ import reducer from '../../source/reducer/reducer';
 test('integration between store, reducer and actions.', assert => {
   const msg = 'should be the final state.',
     actions = [
-      {type: 'command', data: 'base base.json'},
-      {type: 'command', data: 'set broker.name=gonzalo'},
-      {type: 'undo'},
-      {type: 'redo'}
+      {type: 'commit', data: 'base base.json'},
+      {type: 'commit', data: 'set broker.name=gonzalo'},
+      {type: 'prev'},
+      {type: 'prev'},
+      {type: 'next'}
     ],
     expected = {
-      history: ['base base.json', 'set broker.name=gonzalo', ''],
-      count: 3,
-      current: 2
+      history: {
+        commands: ['base base.json', 'set broker.name=gonzalo'],
+        index: 1
+      },
+      present: {
+        buffer: 'set broker.name=gonzalo',
+        command: ''
+      }
     },
     store = makeStore({reducer});
 
@@ -24,7 +30,7 @@ test('integration between store, reducer and actions.', assert => {
 
   store.subscribe(() => {
     i++;
-    if (i === 4) {
+    if (i === 5) {
       let actual = store.getState().toJS();
       assert.deepEqual(actual, expected, msg);
       assert.end();

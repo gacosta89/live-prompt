@@ -18,7 +18,7 @@ export const commit = (state, {data: command}) => {
   return state.merge({
     history: {
       commands: state.get('history').get('commands').push(command),
-      index: state.get('history').get('commands').size + 2
+      index: state.get('history').get('commands').size + 1
     },
     present: {
       buffer: '',
@@ -55,7 +55,7 @@ export const prev = (state) => {
     },
     present: {
       buffer: state.get('history').get('commands').get(index - 1),
-      command: ''
+      command: state.get('present').get('command')
     }
   });
 };
@@ -91,7 +91,8 @@ export const next = (state) => {
       index: index + 1
     },
     present: {
-      buffer: state.get('history').get('commands').get(index + 1)
+      buffer: state.get('history').get('commands').get(index + 1),
+      command: state.get('present').get('command')
     }
   });
 };

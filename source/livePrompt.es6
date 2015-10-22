@@ -8,7 +8,7 @@ import keypress from 'keypress';
 export default function livePrompt ({stdin = process.stdin, stdout = process.stdout, middleware = undefined, prompt = 'live-prompt:$ ', bye = 'see you soon!', encoding = 'utf8'} = {}) {
   const store = makeStore({reducer, middleware}),
     getCurrent = () => {
-      return store.getState().get('history').get(store.getState().get('current'));
+      return store.getState().get('present').get('buffer');
     };
 
   stdin.setEncoding(encoding);
@@ -16,8 +16,6 @@ export default function livePrompt ({stdin = process.stdin, stdout = process.std
   stdin.resume();
   stdout.write(prompt);
   keypress(stdin);
-
-  let buffer = '';
 
   stdin.on('keypress', (ch, key) => {
 
@@ -30,12 +28,12 @@ export default function livePrompt ({stdin = process.stdin, stdout = process.std
       switch (key.name) {
         case 'up':
           store.dispatch({
-            type: 'undo'
+            type: 'prev'
           });
           return;
         case 'down':
           store.dispatch({
-            type: 'redo'
+            type: 'next'
           });
           return;
         case 'escape':
@@ -45,32 +43,28 @@ export default function livePrompt ({stdin = process.stdin, stdout = process.std
           return;
         case 'return':
           stdout.write('\r\n');
-          if (buffer.length !== 0) {
-            store.dispatch({
-              type: 'command',
-              data: buffer
-            });
-            buffer = '';
-          }
+          store.dispatch({
+            type: 'commit',
+            data: getCurrent()
+          });
           return;
         case 'backspace':
-          if (buffer.length > 0) {
-            buffer = buffer.slice(0, -1);
-            stdout.clearLine();
-            stdout.write('\r' + prompt + buffer);
-          }
+          store.dispatch({
+            type: 'backspace'
+          });
           return;
         default:
       }
     }
 
-    buffer += ch;
-    stdout.write(ch);
+    store.dispatch({
+      type: 'chunk',
+      data: ch
+    });
   });
 
   store.subscribe(() => {
-    buffer = getCurrent();
     stdout.clearLine();
-    stdout.write('\r' + prompt + buffer);
+    stdout.write('\r' + prompt + getCurrent());
   });
 }

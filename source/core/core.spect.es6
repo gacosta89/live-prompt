@@ -24,7 +24,7 @@ test('commit', assert => {
     expected = {
       history: {
         commands: ['base base.json', 'set broker.id=225', 'set broker.name=gonzalo'],
-        index: 4
+        index: 3
       },
       present: {
         buffer: '',
