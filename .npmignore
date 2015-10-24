@@ -1,0 +1,9 @@
+*.log
+/test/
+/coverage/
+/docs/
+/examples/
+/.eslint*
+/.gitignore
+/.npmignore
+/circle.yml

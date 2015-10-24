@@ -2,8 +2,8 @@
  * Created by gonzalo on 20/10/15.
  */
 import test from 'tape';
-import makeStore from '../../source/store/store';
-import reducer from '../../source/reducer/reducer';
+import makeStore from '../../../source/store/store';
+import reducer from '../../../source/reducer/reducer';
 
 test('integration between store, reducer and actions.', assert => {
   const msg = 'should be the final state.',

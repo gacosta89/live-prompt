@@ -5,6 +5,15 @@ import reducer from './reducer/reducer';
 import makeStore from './store/store';
 import keypress from 'keypress';
 
+/**
+ * @param stdin
+ * @param stdout
+ * @param middleware
+ * @param prompt
+ * @param bye
+ * @param encoding
+ * @returns {{log}}
+ */
 export default function livePrompt ({stdin = process.stdin, stdout = process.stdout, middleware = undefined, prompt = 'live-prompt:$ ', bye = 'see you soon!', encoding = 'utf8'} = {}) {
   const store = makeStore({reducer, middleware}),
     getCurrent = () => {
@@ -67,4 +76,11 @@ export default function livePrompt ({stdin = process.stdin, stdout = process.std
     stdout.clearLine();
     stdout.write('\r' + prompt + getCurrent());
   });
+
+  return {
+    log (txt) {
+      stdout.write('\r\n' + txt);
+      stdout.write('\r\n' + prompt + getCurrent());
+    }
+  };
 }

@@ -3,7 +3,7 @@
  */
 import test from 'tape';
 import {fromJS} from 'immutable';
-import {commit, prev, next, cancel, backspace, chunk} from './core';
+import {commit, prev, next, cancel, backspace, chunk} from '../../../source/core/core';
 
 test('commit', assert => {
   const msg = 'should commit the current buffer.',
