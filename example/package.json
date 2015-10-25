@@ -1,0 +1,11 @@
+{
+  "name": "example",
+  "version": "1.0.0",
+  "description": "example for live-prompt",
+  "main": "example.es6",
+  "author": "Gonzalo Acosta <gacosta_r@yahoo.com.ar> (https://github.com/gacosta89)",
+  "license": "MIT",
+  "dependencies": {
+    "live-prompt": "^1.0.0"
+  }
+}
