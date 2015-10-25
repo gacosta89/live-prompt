@@ -1,4 +1,4 @@
-# live-prompt
+# live-prompt [![Travis-CI](https://circleci.com/gh/gacosta89/live-prompt.svg)](https://circleci.com/gh/gacosta89/live-prompt)
 
 Node console with history.
 
