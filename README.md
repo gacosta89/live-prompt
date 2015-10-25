@@ -1,6 +1,8 @@
-# live-prompt [![Travis-CI](https://circleci.com/gh/gacosta89/live-prompt.svg)](https://circleci.com/gh/gacosta89/live-prompt)
+# live-prompt 
 
-Node console with history.
+Simple console with history and redux data flow.
+
+[![Circle CI](https://circleci.com/gh/gacosta89/live-prompt.svg)](https://circleci.com/gh/gacosta89/live-prompt) [![npm version](https://img.shields.io/npm/v/live-prompt.svg?style=flat-square)](https://www.npmjs.com/package/live-prompt) [![npm downloads](https://img.shields.io/npm/dm/live-prompt.svg?style=flat-square)](https://www.npmjs.com/package/live-prompt)
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
@@ -12,6 +14,7 @@ Node console with history.
 - [Getting Started](#getting)
 - [Usage](#usage)
 - [History Navigation](#history)
+- [Thanks](#thanks)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -88,6 +91,7 @@ This is a common redux middleware function:
 
     middleware = store => next => action => {
       ...
+      return next(action);
     }
 
 ### Actions:
@@ -137,3 +141,10 @@ Attention: The value of index being equal to the count of commands means that we
 - Navigate through your commands with up and down arrow keys.
 - Cancel edit mode hitting ESC once.
 - Go back to the last command hitting ESC twice.
+
+## Thanks
+
+- [Eric Eliott](https://medium.com/@_ericelliott)
+- [redux](https://reduxframework.com/)
+- [immutable-js](https://facebook.github.io/immutable-js/)
+- [keypress](https://www.npmjs.com/package/keypress)
