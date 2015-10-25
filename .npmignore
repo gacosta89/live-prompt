@@ -2,8 +2,11 @@
 /test/
 /coverage/
 /docs/
-/examples/
+/example/
 /.eslint*
 /.gitignore
 /.npmignore
 /circle.yml
+/source/**/*.js
+/source/**/*.map
+/.idea
