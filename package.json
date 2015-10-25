@@ -1,6 +1,6 @@
 {
   "name": "live-prompt",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Simple console with history and redux data flow.",
   "main": "build/livePrompt.js",
   "scripts": {
