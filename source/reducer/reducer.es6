@@ -1,21 +1,22 @@
 /**
  * Created by gonzalo on 20/10/15.
  */
-import {commit, prev, next, cancel, backspace, chunk, INITIAL_STATE} from '../core/core';
+import {Map} from 'immutable';
 
-export default function reducer (state = INITIAL_STATE, action = {}) {
-  const actionHandlers = {
-    commit,
-    prev,
-    next,
-    cancel,
-    backspace,
-    chunk
+/**
+ * @param actionHandlers
+ * @param INITIAL_STATE
+ * @returns {Function} reducer
+ */
+export default function makeReducer ({actionHandlers = {}, INITIAL_STATE = Map()} = {}) {
+  const reducer = (state = INITIAL_STATE, action = {type: '@@noaction'}) => {
+
+    if (!actionHandlers.hasOwnProperty(action.type)) {
+      return state;
+    }
+
+    return actionHandlers[action.type](state, action);
   };
 
-  if (!actionHandlers.hasOwnProperty(action.type)) {
-    return state;
-  }
-
-  return actionHandlers[action.type](state, action);
+  return reducer;
 }

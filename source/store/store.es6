@@ -3,7 +3,7 @@
  */
 import {createStore, applyMiddleware} from 'redux';
 
-export default function makeStore ({middleware = undefined, reducer = undefined}) {
+export default function makeStore ({reducer, middleware = undefined}) {
   if (typeof middleware !== 'undefined') {
     return applyMiddleware(middleware)(createStore)(reducer);
   }

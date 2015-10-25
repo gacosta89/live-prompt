@@ -45,7 +45,7 @@
     "rimraf": "^2.4.2",
     "tape": "^4.2.1"
   },
-  "author": "Gonzalo Acosta <gacosta.r89@gmail.com> (https://github.com/gacosta89)",
+  "author": "Gonzalo Acosta <gacosta_r@yahoo.com.ar> (https://github.com/gacosta89)",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/gacosta89/live-prompt/issues"
@@ -58,6 +58,7 @@
   "keywords": [
     "prompt",
     "commands",
+    "history",
     "console",
     "redux",
     "functional",

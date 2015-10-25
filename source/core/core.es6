@@ -68,10 +68,6 @@ export const next = (state) => {
     return state;
   }
 
-  if (index === count) {
-    return state;
-  }
-
   if (index === count - 1) {
     return state.merge({
       history: {
@@ -103,35 +99,29 @@ export const cancel = (state) => {
     count = commands.size,
     command = commands.get(index);
 
-  if (index > count) {
+  if (index >= count || index < 0) {
     return state;
   }
 
-  if (index === count) {
-    return state;
-  }
-
-  if (index < count) {
-    if (state.get('present').get('buffer') !== command) {
-      return state.merge({
-        present: {
-          buffer: command,
-          command: state.get('present').get('command')
-        }
-      });
-    }
-
+  if (state.get('present').get('buffer') !== command) {
     return state.merge({
-      history: {
-        commands,
-        index: count
-      },
       present: {
-        buffer: state.get('present').get('command'),
-        command: ''
+        buffer: command,
+        command: state.get('present').get('command')
       }
     });
   }
+
+  return state.merge({
+    history: {
+      commands,
+      index: count
+    },
+    present: {
+      buffer: state.get('present').get('command'),
+      command: ''
+    }
+  });
 };
 
 export const backspace = (state) => {
@@ -143,7 +133,7 @@ export const backspace = (state) => {
   });
 };
 
-export const chunk = (state, {data: ch} = {}) => {
+export const chunk = (state, {data: ch}) => {
   return state.merge({
     present: {
       buffer: state.get('present').get('buffer') + ch,
