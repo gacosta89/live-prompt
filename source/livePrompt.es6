@@ -70,10 +70,12 @@ export default function livePrompt ({
         }
       }
 
-      store.dispatch({
-        type: 'chunk',
-        data: ch
-      });
+      if (typeof ch !== 'undefined') {
+        store.dispatch({
+          type: 'chunk',
+          data: ch
+        });
+      }
     };
 
   store.subscribe(() => {
