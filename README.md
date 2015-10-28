@@ -4,8 +4,6 @@ Simple console with history and redux data flow.
 
 [![Circle CI](https://circleci.com/gh/gacosta89/live-prompt.svg)](https://circleci.com/gh/gacosta89/live-prompt) [![npm version](https://img.shields.io/npm/v/live-prompt.svg?style=flat-square)](https://www.npmjs.com/package/live-prompt) [![npm downloads](https://img.shields.io/npm/dm/live-prompt.svg?style=flat-square)](https://www.npmjs.com/package/live-prompt)
 
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 ## Contents
 
 - [Description](#description)
@@ -13,6 +11,7 @@ Simple console with history and redux data flow.
 - [Features](#features)
 - [Getting Started](#getting)
 - [Usage](#usage)
+- [Example](#example)
 - [History Navigation](#history)
 - [Thanks](#thanks)
 
@@ -135,6 +134,28 @@ This is the data tree of the state.
     }
 
 Attention: The value of index being equal to the count of commands means that we are editing the present command.
+
+## Example
+
+This example will record every committed command to 'commands.txt' and will log the date every 1 minute.
+
+    import livePrompt from 'live-prompt';
+    import fs from 'fs';
+    
+    const commands = fs.createWriteStream('./commands.txt'),
+      middleware = store => next => action => {
+        if (action.type === 'commit') {
+          commands.write(action.data);
+        }
+        return next(action);
+      },
+      prompt = livePrompt({middleware});
+    
+    prompt.start();
+    
+    setInterval(() => {
+      prompt.log('[date]: ' + new Date());
+    }, 60000);
 
 ## History Navigation
 

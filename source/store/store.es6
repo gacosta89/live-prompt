@@ -4,7 +4,7 @@
 import {createStore, applyMiddleware} from 'redux';
 
 export default function makeStore ({reducer, middleware = undefined}) {
-  if (typeof middleware !== 'undefined') {
+  if (typeof middleware === 'function') {
     return applyMiddleware(middleware)(createStore)(reducer);
   }
   return createStore(reducer);
