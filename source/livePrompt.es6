@@ -3,8 +3,9 @@
  */
 import makeReducer from './reducer/reducer';
 import makeStore from './store/store';
-import {commit, next, prev, cancel, backspace, chunk, INITIAL_STATE} from './core/core';
+import {commit, next, prev, cancel, backspace, chunk, right, left, INITIAL_STATE} from './core/core';
 import keypress from 'keypress';
+import readline from 'readline';
 
 export default function livePrompt ({
         stdin = process.stdin,
@@ -19,13 +20,19 @@ export default function livePrompt ({
     commit,
     next,
     prev,
+    right,
+    left,
     cancel,
     backspace,
     chunk
   }}),
     store = makeStore({reducer, middleware}),
+    promptLen = prompt.length,
     getCurrent = () => {
       return store.getState().get('present').get('buffer');
+    },
+    getCursor = () => {
+      return promptLen + store.getState().get('present').get('cursor');
     },
     onExit = typeof onCtrlC === 'function' ? onCtrlC : () => {
       stdout.write('\r\n' + bye + '\r\n');
@@ -47,6 +54,16 @@ export default function livePrompt ({
           case 'down':
             store.dispatch({
               type: 'next'
+            });
+            return;
+          case 'left':
+            store.dispatch({
+              type: 'left'
+            });
+            return;
+          case 'right':
+            store.dispatch({
+              type: 'right'
             });
             return;
           case 'escape':
@@ -81,6 +98,7 @@ export default function livePrompt ({
   store.subscribe(() => {
     stdout.clearLine();
     stdout.write('\r' + prompt + getCurrent());
+    readline.cursorTo(stdout, getCursor());
   });
 
   return {

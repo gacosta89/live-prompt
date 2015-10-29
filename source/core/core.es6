@@ -10,7 +10,8 @@ export const INITIAL_STATE = fromJS({
   },
   present: {
     buffer: '',
-    command: ''
+    command: '',
+    cursor: 0
   }
 });
 
@@ -22,14 +23,16 @@ export const commit = (state, {data: command}) => {
     },
     present: {
       buffer: '',
-      command: ''
+      command: '',
+      cursor: 0
     }
   });
 };
 
 export const prev = (state) => {
   const index = state.get('history').get('index'),
-    count = state.get('history').get('commands').size;
+    count = state.get('history').get('commands').size,
+    buffer = state.get('history').get('commands').get(index - 1);
 
   if (index <= 0) {
     return state;
@@ -42,8 +45,9 @@ export const prev = (state) => {
         index: index - 1
       },
       present: {
-        buffer: state.get('history').get('commands').get(index - 1),
-        command: state.get('present').get('buffer')
+        buffer,
+        command: state.get('present').get('buffer'),
+        cursor: buffer.length
       }
     });
   }
@@ -54,15 +58,17 @@ export const prev = (state) => {
       index: index - 1
     },
     present: {
-      buffer: state.get('history').get('commands').get(index - 1),
-      command: state.get('present').get('command')
+      buffer,
+      command: state.get('present').get('command'),
+      cursor: buffer.length
     }
   });
 };
 
 export const next = (state) => {
   const index = state.get('history').get('index'),
-    count = state.get('history').get('commands').size;
+    count = state.get('history').get('commands').size,
+    command = state.get('present').get('command');
 
   if (index >= count) {
     return state;
@@ -75,8 +81,9 @@ export const next = (state) => {
         index: index + 1
       },
       present: {
-        buffer: state.get('present').get('command'),
-        command: ''
+        buffer: command,
+        command: '',
+        cursor: command.length
       }
     });
   }
@@ -88,7 +95,8 @@ export const next = (state) => {
     },
     present: {
       buffer: state.get('history').get('commands').get(index + 1),
-      command: state.get('present').get('command')
+      command: state.get('present').get('command'),
+      cursor: state.get('history').get('commands').get(index + 1).length
     }
   });
 };
@@ -107,7 +115,8 @@ export const cancel = (state) => {
     return state.merge({
       present: {
         buffer: command,
-        command: state.get('present').get('command')
+        command: state.get('present').get('command'),
+        cursor: command.length
       }
     });
   }
@@ -119,25 +128,43 @@ export const cancel = (state) => {
     },
     present: {
       buffer: state.get('present').get('command'),
-      command: ''
+      command: '',
+      cursor: state.get('present').get('command').length
     }
   });
 };
 
 export const backspace = (state) => {
+  const cursor = state.get('present').get('cursor');
+
+  if (cursor === 0) {
+    return state;
+  }
+
   return state.merge({
     present: {
-      buffer: state.get('present').get('buffer').slice(0, -1),
-      command: state.get('present').get('command')
+      buffer: state.get('present').get('buffer').slice(0, cursor - 1) + state.get('present').get('buffer').slice(cursor),
+      command: state.get('present').get('command'),
+      cursor: state.get('present').get('cursor') - 1
     }
   });
 };
 
 export const chunk = (state, {data: ch}) => {
+  const cursor = state.get('present').get('cursor');
   return state.merge({
     present: {
-      buffer: state.get('present').get('buffer') + ch,
-      command: state.get('present').get('command')
+      buffer: state.get('present').get('buffer').slice(0, cursor) + ch + state.get('present').get('buffer').slice(cursor),
+      command: state.get('present').get('command'),
+      cursor: state.get('present').get('cursor') + 1
     }
   });
+};
+
+export const right = (state) => {
+  return state.updateIn(['present', 'cursor'], value => value < state.get('present').get('buffer').length ? value + 1 : value);
+};
+
+export const left = (state) => {
+  return state.updateIn(['present', 'cursor'], value => value > 0 ? value - 1 : 0);
 };
