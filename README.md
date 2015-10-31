@@ -107,6 +107,14 @@ Next is dispatched when you hit down arrow key.
 
     {type: 'next'}
 
+Left is dispatched when you hit left arrow key.
+
+    {type: 'left'}
+
+Right is dispatched when you hit right arrow key.
+
+    {type: 'right'}
+
 Cancel is dispatched when you hit ESC key.
 
     {type: 'cancel'}
@@ -130,6 +138,7 @@ This is the data tree of the state.
       present: {
         buffer: '...', // it is the current command you are editing/navigating.
         current: '...', // keeps your last input while you are navigating around the history.
+        cursor: 0, // current cursor position in buffer.
       }
     }
 
