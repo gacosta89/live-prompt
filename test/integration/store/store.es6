@@ -5,7 +5,6 @@ import test from 'tape';
 import makeStore from '../../../source/store/store';
 import makeReducer from '../../../source/reducer/reducer';
 import {commit, prev, next, cancel, backspace, chunk, INITIAL_STATE} from '../../../source/core/core';
-import {List, is, fromJS} from 'immutable';
 
 test('integration between store, reducer and actions.', assert => {
   assert.plan(2);
@@ -20,14 +19,15 @@ test('integration between store, reducer and actions.', assert => {
       {type: 'prev'},
       {type: 'next'}
     ],
-    expected = fromJS([{
+    expected = [{
       history: {
         commands: ['base base.json'],
         index: 1
       },
       present: {
         buffer: '',
-        command: ''
+        command: '',
+        cursor: 0
       }
     },
     {
@@ -37,7 +37,8 @@ test('integration between store, reducer and actions.', assert => {
       },
       present: {
         buffer: '',
-        command: ''
+        command: '',
+        cursor: 0
       }
     },
     {
@@ -47,7 +48,8 @@ test('integration between store, reducer and actions.', assert => {
       },
       present: {
         buffer: 'set broker.name=gonzalo',
-        command: ''
+        command: '',
+        cursor: 23
       }
     },
     {
@@ -57,7 +59,8 @@ test('integration between store, reducer and actions.', assert => {
       },
       present: {
         buffer: 'set broker.name=gonzal',
-        command: ''
+        command: '',
+        cursor: 22
       }
     },
     {
@@ -67,7 +70,8 @@ test('integration between store, reducer and actions.', assert => {
       },
       present: {
         buffer: 'set broker.name=gonzalo',
-        command: ''
+        command: '',
+        cursor: 23
       }
     },
     {
@@ -77,7 +81,8 @@ test('integration between store, reducer and actions.', assert => {
       },
       present: {
         buffer: '',
-        command: ''
+        command: '',
+        cursor: 0
       }
     },
     {
@@ -87,7 +92,8 @@ test('integration between store, reducer and actions.', assert => {
       },
       present: {
         buffer: 'set broker.name=gonzalo',
-        command: ''
+        command: '',
+        cursor: 23
       }
     },
     {
@@ -97,9 +103,10 @@ test('integration between store, reducer and actions.', assert => {
       },
       present: {
         buffer: '',
-        command: ''
+        command: '',
+        cursor: 0
       }
-    }]),
+    }],
     reducer = makeReducer({INITIAL_STATE, actionHandlers: {
       commit,
       prev,
@@ -111,20 +118,20 @@ test('integration between store, reducer and actions.', assert => {
     storeWithMiddleware = makeStore({reducer, middleware: store => next => action => next(action)}),
     storeWithoutMiddleware = makeStore({reducer});
 
-  let i = 0, j = 0, actualWith = List(), actualWithout = List();
+  let i = 0, j = 0, actualWith = [], actualWithout = [];
 
   storeWithMiddleware.subscribe(() => {
-    actualWith = actualWith.push(storeWithMiddleware.getState());
+    actualWith.push(storeWithMiddleware.getState().toJS());
     if (i === 7) {
-      assert.equal(is(actualWith, expected), true, msg);
+      assert.deepEqual(actualWith, expected, msg);
     }
     i++;
   });
 
   storeWithoutMiddleware.subscribe(() => {
-    actualWithout = actualWithout.push(storeWithoutMiddleware.getState());
+    actualWithout.push(storeWithoutMiddleware.getState().toJS());
     if (j === 7) {
-      assert.equal(is(actualWithout, expected), true, msg);
+      assert.deepEqual(actualWithout, expected, msg);
     }
     j++;
   });
