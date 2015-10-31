@@ -1,7 +1,7 @@
 /**
  * Created by gonzalo on 24/10/15.
  */
-import livePrompt from '../source/livePrompt';
+import livePrompt from 'live-prompt';
 import fs from 'fs';
 
 const commands = fs.createWriteStream('./commands.txt'),
